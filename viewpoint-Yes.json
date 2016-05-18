@@ -231,7 +231,7 @@
           },
           "dataDisks": [
             {
-              "name": "datadisk0",
+              "name": "[concat('datadisk',concat(parameters('vmNamePrefix'),copyIndex()))]",
               "diskSizeGB": "[variables('dataDiskSize')]",
               "lun": 0,
               "vhd": {
