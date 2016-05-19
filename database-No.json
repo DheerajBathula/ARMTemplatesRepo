@@ -1,6 +1,97 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {},
-    "resources": []
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location were resources will be deployed"
+      }
+    },
+    "adminUsername": {
+      "defaultValue": "azureuser",
+      "type": "string",
+      "metadata": {
+        "description": "Admin username for the virtual machines and SSH"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Admin password for the virtual machines and SSH. Keep empty if providing SSH Public Key authentication type."
+      }
+    },
+    "sshPublicKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X. Keep empty if providing Password authentication type."
+      }
+    },
+    "authenticationType": {
+      "type": "string",
+      "defaultValue": "password",
+      "allowedValues": [
+        "password",
+        "sshPublicKey"
+      ],
+      "metadata": {
+        "description": "Authentication type for the virtual machines"
+      }
+    },
+    "vmCount": {
+      "defaultValue": 1,
+      "type": "int",
+      "metadata": {
+        "description": "Number of VMs to create"
+      }
+    },
+    "vmNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Prefix for the VM names"
+      }
+    },
+    "vmSize": {
+      "defaultValue": "Standard_D2",
+      "type": "string",
+      "metadata": {
+        "description": "Size of the VMs"
+      }
+    },
+	"osDiskVhdUri": {
+      "type": "string",
+      "metadata": {
+        "description": "Uri of the your user image"
+      }
+    },
+    "subnetID": {
+      "type": "string",
+      "metadata": {
+        "description": "Existing subnet for the virtual machine"
+      }
+    },
+    "storageAccountCount": {
+      "defaultValue": 1,
+      "type": "int",
+      "metadata": {
+        "description": "Number of unique storage accounts to create"
+      }
+    },
+    "storageAccountType": {
+      "defaultValue": "Standard_LRS",
+      "type": "string",
+      "metadata": {
+        "description": "Storage account type"
+      }
+    },
+    "storageAccountDiagnostics": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of an existing storage account for diagnostic extension"
+      }
+    }
+  },
+  "resources": []
 }

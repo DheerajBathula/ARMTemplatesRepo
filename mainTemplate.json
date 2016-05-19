@@ -12,6 +12,7 @@
 		},
 		"location": {
 		  "type": "string",
+		  "defaultValue": "West US",
 		  "metadata": {
 			"description": "Location were resources will be deployed"
 		  }
@@ -259,14 +260,15 @@
 		  }
 		},
 
+		"osDiskVhdUri": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd",
 		"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
 		"templateUrlViewPoint": "[concat(variables('baseUrl'),'viewpoint-',parameters('deployViewPoint'),'.json')]",
-		"templateUrlServerManager": "[variables('baseUrl'),'servermanager-',parameters('deployServerManager'),'.json')]",
-		"templateUrlDataMover": "[variables('baseUrl'),'datamover-',parameters('deployDataMover'),'.json')]",
+		"templateUrlServerManager": "[concat(variables('baseUrl'),'servermanager-',parameters('deployServerManager'),'.json')]",
+		"templateUrlDataMover": "[concat(variables('baseUrl'),'datamover-',parameters('deployDataMover'),'.json')]",
 		"templateUrlDSU": "[concat(variables('baseUrl'),'dsu-',parameters('deployDSU'),'.json')]",
 		"templateUrlDataBase": "[concat(variables('baseUrl'),'database-',parameters('deployDataBase'),'.json')]",
 		"templateUrlPublicIP": "[concat(variables('baseUrl'),'publicIP-',parameters('publicIPAddressNewOrExisting'),'.json')]",
-		"templateUrlVnet": "[concat(variables('baseUrl'),parameters('vnetNewOrExisting'),'.json')]",
+		"templateUrlVnet": "[concat(variables('baseUrl'),'vnet-',parameters('vnetNewOrExisting'),'.json')]",
 
 		"sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
 		"linuxConfiguration_sshPublicKey": {
@@ -398,7 +400,7 @@
 				"value": "[parameters('clusterVmSizeViewPoint')]"
 			  },
 			  "osDiskVhdUri": {
-				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+				"value": "[variables('osDiskVhdUri')]"
 			  },
 			  "subnetID": {
 				"value": "[variables('subnetID')]"
@@ -448,7 +450,7 @@
 				"value": "[parameters('clusterVmSizeServerManager')]"
 			  },
 			  "osDiskVhdUri": {
-				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+				"value": "[variables('osDiskVhdUri')]"
 			  },
 			  "subnetID": {
 				"value": "[variables('subnetID')]"
@@ -498,7 +500,7 @@
 				"value": "[parameters('clusterVmSizeDataMover')]"
 			  },
 			  "osDiskVhdUri": {
-				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+				"value": "[variables('osDiskVhdUri')]"
 			  },
 			  "subnetID": {
 				"value": "[variables('subnetID')]"
@@ -551,7 +553,7 @@
 				"value": "[parameters('clusterVmSizeDSU')]"
 			  },
 			  "osDiskVhdUri": {
-				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+				"value": "[variables('osDiskVhdUri')]"
 			  },
 			  "subnetID": {
 				"value": "[variables('subnetID')]"
@@ -604,7 +606,7 @@
 				"value": "[parameters('clusterVmSizeDataBase')]"
 			  },
 			  "osDiskVhdUri": {
-				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+				"value": "[variables('osDiskVhdUri')]"
 			  },
 			  "subnetID": {
 				"value": "[variables('subnetID')]"
