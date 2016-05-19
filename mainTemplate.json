@@ -4,10 +4,10 @@
 	  "parameters": {
 		"artifactsBaseUrl": {
 		  "type": "string",
-		  "defaultValue": "",
+		  "defaultValue": "https://raw.githubusercontent.com/DheerajBathula/ARMTemplatesRepo/master",
 		  "metadata": {
 			"description": "Base URL of the solution template gallery package not including the trailing slash",
-			"artifactsBaseUrl": "https://gist.githubusercontent.com/DheerajBathula/860230aa4ac0caefe8982e96da228dbd/raw/f6b0f2045adf3036703d3f6533eb18dfd8495689"
+			"artifactsBaseUrl": "https://raw.githubusercontent.com/DheerajBathula/ARMTemplatesRepo/master/"
 		  }
 		},
 		"location": {
@@ -260,13 +260,13 @@
 		},
 
 		"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-		"templateUrlViewPoint": "[concat('https://gist.githubusercontent.com/btprabhu/49bce6e5b4065f9c3fe97dfc82a740db/raw/943e8a0cfe28c58e5dd3a5fd3d1020db3c8034c2/','viewpoint-',parameters('deployViewPoint'),'.json')]",
-		"templateUrlServerManager": "[concat('https://gist.githubusercontent.com/btprabhu/91b0812017f0b0a28c27d9bf4c47dfff/raw/f4baed16a602954b9446cd2f85a742b01708c1b1/','servermanager-',parameters('deployServerManager'),'.json')]",
-		"templateUrlDataMover": "[concat('https://gist.githubusercontent.com/btprabhu/77851007a6f7627c7e825543d2d0f440/raw/33cd7478ef9408024615fe58b1de8fc9ebb6fc2b/','datamover-',parameters('deployDataMover'),'.json')]",
-		"templateUrlDSU": "[concat('https://gist.githubusercontent.com/btprabhu/443121c61a7e934abd60aa468c8a4116/raw/eba1f7098fffc67ff5b15ad3646f9ced04de7552/','dsu-',parameters('deployDSU'),'.json')]",
-		"templateUrlDataBase": "https://gist.githubusercontent.com/btprabhu/3e850efc48bf1251aca46a23175852dd/raw/19551bae2cac893f46be17605fd0e135c498254e/database-Yes.json",
-		"templateUrlPublicIP": "[concat('https://gist.githubusercontent.com/btprabhu/ecf8c8a9e1e09e89a703bfe561eb8005/raw/4f5c257beef1ffcea5d5d011e11328152633ddc0/','publicIP-',parameters('publicIPAddressNewOrExisting'),'.json')]",
-		"templateUrlVnet": "[concat('https://gist.githubusercontent.com/btprabhu/74c452306d7b5c22fbfba83cc5bd6916/raw/84af06fe85a47c79e761e927a5b7d398a0035eaa/vnet-',parameters('vnetNewOrExisting'),'.json')]",
+		"templateUrlViewPoint": "[concat(variables('baseUrl'),'viewpoint-',parameters('deployViewPoint'),'.json')]",
+		"templateUrlServerManager": "[variables('baseUrl'),'servermanager-',parameters('deployServerManager'),'.json')]",
+		"templateUrlDataMover": "[variables('baseUrl'),'datamover-',parameters('deployDataMover'),'.json')]",
+		"templateUrlDSU": "[concat(variables('baseUrl'),'dsu-',parameters('deployDSU'),'.json')]",
+		"templateUrlDataBase": "[concat(variables('baseUrl'),'database-',parameters('deployDataBase'),'.json')]",
+		"templateUrlPublicIP": "[concat(variables('baseUrl'),'publicIP-',parameters('publicIPAddressNewOrExisting'),'.json')]",
+		"templateUrlVnet": "[concat(variables('baseUrl'),parameters('vnetNewOrExisting'),'.json')]",
 
 		"sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
 		"linuxConfiguration_sshPublicKey": {
