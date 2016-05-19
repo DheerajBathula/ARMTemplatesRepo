@@ -1,0 +1,285 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location were resources will be deployed"
+      }
+    },
+    "adminUsername": {
+      "defaultValue": "azureuser",
+      "type": "string",
+      "metadata": {
+        "description": "Admin username for the virtual machines and SSH"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Admin password for the virtual machines and SSH. Keep empty if providing SSH Public Key authentication type."
+      }
+    },
+    "sshPublicKey": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X. Keep empty if providing Password authentication type."
+      }
+    },
+    "authenticationType": {
+      "type": "string",
+      "defaultValue": "password",
+      "allowedValues": [
+        "password",
+        "sshPublicKey"
+      ],
+      "metadata": {
+        "description": "Authentication type for the virtual machines"
+      }
+    },
+    "vmCount": {
+      "defaultValue": 1,
+      "type": "int",
+      "metadata": {
+        "description": "Number of VMs to create"
+      }
+    },
+    "vmNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Prefix for the VM names"
+      }
+    },
+    "vmSize": {
+      "defaultValue": "Standard_D2",
+      "type": "string",
+      "metadata": {
+        "description": "Size of the VMs"
+      }
+    },
+	"osDiskVhdUri": {
+      "type": "string",
+      "metadata": {
+        "description": "Uri of the your user image"
+      }
+    },
+    "subnetID": {
+      "type": "string",
+      "metadata": {
+        "description": "Existing subnet for the virtual machine"
+      }
+    },
+    "storageAccountCount": {
+      "defaultValue": 1,
+      "type": "int",
+      "metadata": {
+        "description": "Number of unique storage accounts to create"
+      }
+    },
+    "storageAccountType": {
+      "defaultValue": "Standard_LRS",
+      "type": "string",
+      "metadata": {
+        "description": "Storage account type"
+      }
+    },
+    "storageAccountDiagnostics": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of an existing storage account for diagnostic extension"
+      }
+    }
+  },
+  "variables": {
+    "nicName": "[concat(parameters('vmNamePrefix'),'-nic')]",
+    "availabilitySetSettings": {
+      "name": "[concat(parameters('vmNamePrefix'),'-avset')]",
+      "faultDomainCount": "3",
+      "updateDomainCount": "5"
+    },
+    "vhdsContainer": "vhds",
+    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+    "linuxConfiguration_sshPublicKey": {
+      "disablePasswordAuthentication": "true",
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[variables('sshKeyPath')]",
+            "keyData": "[parameters('sshPublicKey')]"
+          }
+        ]
+      }
+    },
+    "linuxConfiguration_password": { },
+    "linuxConfiguration": "[variables(concat('linuxConfiguration_',parameters('authenticationType')))]",
+    "storageAccountsArray": [
+      "[concat(uniqueString(resourceGroup().id,'0'),parameters('vmNamePrefix'),'0')]",
+      "[concat(uniqueString(resourceGroup().id,'1'),parameters('vmNamePrefix'),'1')]",
+      "[concat(uniqueString(resourceGroup().id,'2'),parameters('vmNamePrefix'),'2')]",
+      "[concat(uniqueString(resourceGroup().id,'3'),parameters('vmNamePrefix'),'3')]",
+      "[concat(uniqueString(resourceGroup().id,'4'),parameters('vmNamePrefix'),'4')]",
+      "[concat(uniqueString(resourceGroup().id,'5'),parameters('vmNamePrefix'),'5')]",
+      "[concat(uniqueString(resourceGroup().id,'6'),parameters('vmNamePrefix'),'6')]",
+      "[concat(uniqueString(resourceGroup().id,'7'),parameters('vmNamePrefix'),'7')]",
+      "[concat(uniqueString(resourceGroup().id,'8'),parameters('vmNamePrefix'),'8')]",
+      "[concat(uniqueString(resourceGroup().id,'9'),parameters('vmNamePrefix'),'9')]",
+      "[concat(uniqueString(resourceGroup().id,'10'),parameters('vmNamePrefix'),'10')]",
+      "[concat(uniqueString(resourceGroup().id,'11'),parameters('vmNamePrefix'),'11')]",
+      "[concat(uniqueString(resourceGroup().id,'12'),parameters('vmNamePrefix'),'12')]",
+      "[concat(uniqueString(resourceGroup().id,'13'),parameters('vmNamePrefix'),'13')]",
+      "[concat(uniqueString(resourceGroup().id,'14'),parameters('vmNamePrefix'),'14')]",
+      "[concat(uniqueString(resourceGroup().id,'15'),parameters('vmNamePrefix'),'15')]",
+      "[concat(uniqueString(resourceGroup().id,'16'),parameters('vmNamePrefix'),'16')]",
+      "[concat(uniqueString(resourceGroup().id,'17'),parameters('vmNamePrefix'),'17')]",
+      "[concat(uniqueString(resourceGroup().id,'18'),parameters('vmNamePrefix'),'18')]",
+      "[concat(uniqueString(resourceGroup().id,'19'),parameters('vmNamePrefix'),'19')]"
+    ],
+    "dataDiskSize": 128
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountsArray')[copyIndex()]]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "storageAccountsCopy",
+        "count": "[parameters('storageAccountCount')]"
+      },
+      "properties": {
+        "accountType": "[parameters('storageAccountType')]"
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetSettings').name]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "platformFaultDomainCount": "[variables('availabilitySetSettings').faultDomainCount]",
+        "platformUpdateDomainCount": "[variables('availabilitySetSettings').updateDomainCount]"
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('nicName'),copyIndex())]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "nicCopy",
+        "count": "[parameters('vmCount')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ip1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[parameters('subnetID')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmNamePrefix'),copyIndex())]",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "nodeCopy",
+        "count": "[parameters('vmCount')]"
+      },
+      "dependsOn": [
+        "storageAccountsCopy",
+        "[concat('Microsoft.Network/networkInterfaces/', concat(variables('nicName'),copyIndex()))]",
+        "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetSettings').name)]"
+      ],
+      "tags": {
+        "NodeType": "[parameters('vmNamePrefix')]"
+      },
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetSettings').name)]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computername": "[concat(parameters('vmNamePrefix'),copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "linuxConfiguration": "[variables('linuxConfiguration')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "name": "osdisk",
+			"osType": "Linux",
+            "image": {
+              "uri": "[parameters('osDiskVhdUri')]"
+            },
+            "vhd": {
+              "uri": "[concat('https://uniquestorageaccountt12.blob.core.windows.net/', variables('vhdsContainer'), '/', concat(parameters('vmNamePrefix'),copyIndex()),'-os.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "[concat('datadisk',concat(parameters('vmNamePrefix'),copyIndex()))]",
+              "diskSizeGB": "[variables('dataDiskSize')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[concat('http://', variables('storageAccountsArray')[mod(copyIndex(),parameters('storageAccountCount'))], '.blob.core.windows.net/', variables('vhdsContainer'), '/', concat(parameters('vmNamePrefix'),copyIndex()),'-data0.vhd')]"
+              },
+              "caching": "None",
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'),copyIndex()))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://', parameters('storageAccountDiagnostics'), '.blob.core.windows.net')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(concat(parameters('vmNamePrefix'),copyIndex()), '/init')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "nodeCopy"
+      ],
+      "copy": {
+        "name": "nodeExtensionsCopy",
+        "count": "[parameters('vmCount')]"
+      },
+      "properties": {
+        "publisher": "Microsoft.OSTCExtensions",
+        "type": "CustomScriptForLinux",
+        "typeHandlerVersion": "1.5",
+        "settings": {
+          "fileUris": [
+            ""
+          ],
+          "commandToExecute": "[concat('logger ', concat(parameters('vmNamePrefix'),copyIndex()))]"
+        }
+      }
+    }
+  ]
+}

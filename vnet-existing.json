@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiVersion": {
+      "type": "object",
+      "metadata": {
+        "description": "Object with all relevant API versions passed from the mainTemplate"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for the deployed resources"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network name (e.g. vnet-xyz)"
+      }
+    },
+    "vnetResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Resource Group"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Address Prefix (i.e. CIDR)"
+      }
+    },
+    "subnet1Name": {
+      "type": "string",
+      "metadata": {
+        "description": "Servers will be deployed into this subnet within the Virtual Network"
+      }
+    },
+    "subnet1AddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network subnet1 Address Prefix (i.e. CIDR)"
+      }
+    },
+    "subnet2Name": {
+      "type": "string",
+      "metadata": {
+        "description": "Other servers can be deployed into this subnet within the Virtual Network"
+      }
+    },
+    "subnet2AddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network subnet2 subnet Address Prefix (i.e. CIDR)"
+      }
+    }
+  },
+  "variables": {
+    "apiVersion": "[parameters('apiVersion')]",
+    "vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+  },
+  "resources": [
+
+  ],
+  "outputs": {
+
+  }
+}

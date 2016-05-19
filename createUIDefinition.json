@@ -1,0 +1,526 @@
+{
+  "handler": "Microsoft.Compute.MultiVm",
+  "version": "0.0.1-preview",
+  "parameters": {
+    "basics": [{
+      "name": "adminUsername",
+      "type": "Microsoft.Compute.UserNameTextBox",
+      "label": "Username",
+      "toolTip": "Admin username for the virtual machines. Same Credientials is to SSH to the box.",
+      "osPlatform": "Linux"
+    }, {
+      "name": "SSHCredntials",
+      "type": "Microsoft.Compute.CredentialsCombo",
+      "label": {
+        "authenticationType": "Authentication type",
+        "password": "Password",
+        "confirmPassword": "Confirm password",
+        "sshPublicKey": "SSH public key"
+      },
+      "toolTip": {
+        "authenticationType": "",
+        "password": "",
+        "sshPublicKey": ""
+      },
+      "constraints": {
+        "required": true
+      },
+      "options": {
+        "hideConfirmation": false
+      },
+      "osPlatform": "Linux"
+    }],
+    "steps": [{
+      "name": "ViewPointConfig",
+      "label": "View Point settings",
+      "subLabel": {
+        "preValidation": "Configure view point",
+        "postValidation": "Done"
+      },
+      "bladeTitle": "View Point settings",
+      "elements": [
+        {
+          "name": "deployViewPoint",
+          "type": "Microsoft.Common.DropDown",
+          "label": "Deploy ViewPoint",
+          "defaultValue": "No",
+          "toolTip": "Do you want to deploy View Point.",
+          "constraints": {
+            "allowedValues": [
+                {
+                  "label": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "label": "No",
+                  "value": "No"
+                }
+              ]
+            }
+        },
+        {
+          "name": "clusterVmSize",
+          "type": "Microsoft.Compute.SizeSelector",
+          "label": "Virtual machine size",
+          "toolTip": "The size of virtual machine to provision for each cluster node.",
+          "recommendedSizes": [
+            "Standard_D1",
+            "Standard_D2",
+            "Standard_D3",
+            "Standard_D4"
+          ],
+          "constraints": {
+            "allowedSizes": [
+              "Standard_D1",
+              "Standard_D2",
+              "Standard_D3",
+              "Standard_D4"
+            ]
+          },
+          "osPlatform": "Linux",
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "14.04.2-LTS"
+          },
+		  "visible": "[equals('Yes', steps('ViewPointConfig').deployViewPoint)]"
+        },
+	    {
+            "name": "vmNamePrefix",
+            "type": "Microsoft.Common.TextBox",
+            "label": "VM name prefix",
+            "defaultValue": "viewpoint",
+            "toolTip": "Prefix that will be used for all virtual machines in the cluster",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-z0-9]{2,14}$",
+              "validationMessage": "VM name prefix must be between 3 and 15 characters long, can contain only numbers and lowercase letters, and must start with a letter"
+            },
+			"visible": "[equals('Yes', steps('ViewPointConfig').deployViewPoint)]"
+        }
+      ]
+    },
+	{
+      "name": "ServerManagerConfig",
+      "label": "Server Manager settings",
+      "subLabel": {
+        "preValidation": "Configure Server Manager",
+        "postValidation": "Done"
+      },
+      "bladeTitle": "Server Manager settings",
+      "elements": [
+		{
+          "name": "deployServerManager",
+          "type": "Microsoft.Common.DropDown",
+          "label": "Deploy ServerManager",
+          "defaultValue": "No",
+          "toolTip": "Do you want to deploy Server Manager.",
+          "constraints": {
+            "allowedValues": [
+                {
+                  "label": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "label": "No",
+                  "value": "No"
+                }
+              ]
+            }
+        },
+		{
+          "name": "clusterVmSize",
+          "type": "Microsoft.Compute.SizeSelector",
+          "label": "Virtual machine size",
+          "toolTip": "The size of virtual machine to provision for each cluster node.",
+          "recommendedSizes": [
+            "Standard_D1",
+            "Standard_D2",
+            "Standard_D3",
+            "Standard_D4"
+          ],
+          "constraints": {
+            "allowedSizes": [
+              "Standard_D1",
+              "Standard_D2",
+              "Standard_D3",
+              "Standard_D4"
+            ]
+          },
+          "osPlatform": "Linux",
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "14.04.2-LTS"
+          },
+		  "visible": "[equals('Yes', steps('ServerManagerConfig').deployServerManager)]"
+        },
+	    {
+            "name": "vmNamePrefix",
+            "type": "Microsoft.Common.TextBox",
+            "label": "VM name prefix",
+            "defaultValue": "servermanager",
+            "toolTip": "Prefix that will be used for all virtual machines in the cluster",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-z0-9]{2,14}$",
+              "validationMessage": "VM name prefix must be between 3 and 15 characters long, can contain only numbers and lowercase letters, and must start with a letter"
+            },
+			"visible": "[equals('Yes', steps('ServerManagerConfig').deployServerManager)]"
+        }
+      ]
+    },
+	{
+      "name": "DataMoverConfig",
+      "label": "Data Mover settings",
+      "subLabel": {
+        "preValidation": "Configure Data Mover",
+        "postValidation": "Done"
+      },
+      "bladeTitle": "Data Mover settings",
+      "elements": [
+		{
+          "name": "deployDataMover",
+          "type": "Microsoft.Common.DropDown",
+          "label": "Deploy DataMover",
+          "defaultValue": "No",
+          "toolTip": "Do you want to deploy DataMover.",
+          "constraints": {
+            "allowedValues": [
+                {
+                  "label": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "label": "No",
+                  "value": "No"
+                }
+              ]
+            }
+        },
+		{
+          "name": "clusterVmSize",
+          "type": "Microsoft.Compute.SizeSelector",
+          "label": "Virtual machine size",
+          "toolTip": "The size of virtual machine to provision for each cluster node.",
+          "recommendedSizes": [
+            "Standard_D1",
+            "Standard_D2",
+            "Standard_D3",
+            "Standard_D4"
+          ],
+          "constraints": {
+            "allowedSizes": [
+              "Standard_D1",
+              "Standard_D2",
+              "Standard_D3",
+              "Standard_D4"
+            ]
+          },
+          "osPlatform": "Linux",
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "14.04.2-LTS"
+          },
+		  "visible": "[equals('Yes', steps('DataMoverConfig').deployDataMover)]"
+        },
+	    {
+            "name": "vmNamePrefix",
+            "type": "Microsoft.Common.TextBox",
+            "label": "VM name prefix",
+            "defaultValue": "datamover",
+            "toolTip": "Prefix that will be used for all virtual machines in the cluster",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-z0-9]{2,14}$",
+              "validationMessage": "VM name prefix must be between 3 and 15 characters long, can contain only numbers and lowercase letters, and must start with a letter"
+            },
+			"visible": "[equals('Yes', steps('DataMoverConfig').deployDataMover)]"
+        }
+      ]
+    },
+	{
+      "name": "DSUConfig",
+      "label": "DSU settings",
+      "subLabel": {
+        "preValidation": "Configure DSU",
+        "postValidation": "Done"
+      },
+      "bladeTitle": "DSU settings",
+      "elements": [
+		{
+          "name": "deployDSU",
+          "type": "Microsoft.Common.DropDown",
+          "label": "Deploy DSU",
+          "defaultValue": "No",
+          "toolTip": "Do you want to deploy DSU.",
+          "constraints": {
+            "allowedValues": [
+                {
+                  "label": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "label": "No",
+                  "value": "No"
+                }
+              ]
+            }
+        },
+		{
+          "name": "clusterVmSize",
+          "type": "Microsoft.Compute.SizeSelector",
+          "label": "Virtual machine size",
+          "toolTip": "The size of virtual machine to provision for each cluster node.",
+          "recommendedSizes": [
+            "Standard_D1",
+            "Standard_D2",
+            "Standard_D3",
+            "Standard_D4"
+          ],
+          "constraints": {
+            "allowedSizes": [
+              "Standard_D1",
+              "Standard_D2",
+              "Standard_D3",
+              "Standard_D4"
+            ]
+          },
+          "osPlatform": "Linux",
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "14.04.2-LTS"
+          },
+		  "visible": "[equals('Yes', steps('DSUConfig').deployDSU)]"
+        },
+	    {
+            "name": "vmNamePrefix",
+            "type": "Microsoft.Common.TextBox",
+            "label": "VM name prefix",
+            "defaultValue": "dsu",
+            "toolTip": "Prefix that will be used for all virtual machines in the cluster",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-z0-9]{2,14}$",
+              "validationMessage": "VM name prefix must be between 3 and 15 characters long, can contain only numbers and lowercase letters, and must start with a letter"
+            },
+			"visible": "[equals('Yes', steps('DSUConfig').deployDSU)]"
+        }
+      ]
+    },
+	{
+      "name": "DataBaseConfig",
+      "label": "Data Base settings",
+      "subLabel": {
+        "preValidation": "Configure Data Base",
+        "postValidation": "Done"
+      },
+      "bladeTitle": "Data Base settings",
+      "elements": [
+		{
+          "name": "deployDataBase",
+          "type": "Microsoft.Common.DropDown",
+          "label": "Deploy DataBase",
+          "defaultValue": "Yes",
+          "toolTip": "Do you want to deploy Data Base.",
+          "constraints": {
+            "allowedValues": [
+                {
+                  "label": "Yes",
+                  "value": "Yes"
+                },
+                {
+                  "label": "No",
+                  "value": "No"
+                }
+              ]
+            }
+        },
+		{
+          "name": "clusterNodeCount",
+          "type": "Microsoft.Common.DropDown",
+          "label": "Node Count",
+          "defaultValue": "2",
+          "toolTip": "The number of virtual machines (nodes) to provision for the cluster.",
+          "constraints": {
+            "allowedValues": [{
+                "label": "2",
+                "value": 2
+              }, {
+                "label": "4",
+                "value": 4
+              }, {
+                "label": "8",
+                "value": 8
+              }, {
+                "label": "16",
+                "value": 16
+              }, {
+                "label": "32",
+                "value": 32
+              }
+            ]
+          },
+		  "visible": "[equals('Yes', steps('DataBaseConfig').deployDataBase)]"
+        }, {
+          "name": "clusterVmSize",
+          "type": "Microsoft.Compute.SizeSelector",
+          "label": "Virtual machine size",
+          "toolTip": "The size of virtual machine to provision for each cluster node.",
+          "recommendedSizes": [
+            "Standard_D1",
+            "Standard_D2",
+            "Standard_D3",
+            "Standard_D4"
+          ],
+          "constraints": {
+            "allowedSizes": [
+              "Standard_D1",
+              "Standard_D2",
+              "Standard_D3",
+              "Standard_D4"
+            ]
+          },
+          "osPlatform": "Linux",
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "UbuntuServer",
+            "sku": "14.04.2-LTS"
+          },
+          "count": "[steps('DataBaseConfig').clusterNodeCount]",
+		  "visible": "[equals('Yes', steps('DataBaseConfig').deployDataBase)]"
+        },
+	    {
+            "name": "vmNamePrefix",
+            "type": "Microsoft.Common.TextBox",
+            "label": "VM name prefix",
+            "defaultValue": "database",
+            "toolTip": "Prefix that will be used for all virtual machines in the cluster",
+            "constraints": {
+              "required": true,
+              "regex": "^[a-z][a-z0-9]{2,14}$",
+              "validationMessage": "VM name prefix must be between 3 and 15 characters long, can contain only numbers and lowercase letters, and must start with a letter"
+            },
+			"visible": "[equals('Yes', steps('DataBaseConfig').deployDataBase)]"
+        }
+      ]
+    },
+	{
+        "name": "generalConfig",
+        "label": "Network settings",
+        "subLabel": {
+          "preValidation": "Configure network",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Network settings",
+        "elements": [
+          {
+            "name": "virtualNetworkSection",
+            "type": "Microsoft.Common.Section",
+            "label": "New Virtual Network Configuration",
+            "elements": [
+              {
+                "name": "virtualNetwork",
+                "type": "Microsoft.Network.VirtualNetworkCombo",
+                "label": {
+                  "virtualNetwork": "Virtual network",
+                  "subnets": "Subnets"
+                },
+                "toolTip": {
+                  "virtualNetwork": "Clusters servers can be deployed only into a new virtual network",
+                  "subnets": "For a new virtual network, the deployment will create two subnets putting the servers into one and leaving the second one empty"
+                },
+                "defaultValue": {
+                  "name": "vnet-teradata",
+                  "addressPrefixSize": "/16"
+                },
+                "constraints": {
+                  "minAddressPrefixSize": "/22"
+                },
+                "options": {
+                  "hideExisting": true
+                },
+                "subnets": {
+                  "subnet": {	
+                    "label": "Subnet",
+                    "defaultValue": {
+                      "name": "subnet",
+                      "addressPrefixSize": "/24"
+                    },
+                    "constraints": {
+                      "minAddressPrefixSize": "/24",
+                      "minAddressCount": 20,
+                      "requireContiguousAddresses": true
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "publicIPSection",
+            "type": "Microsoft.Common.Section",
+            "label": "New Public IP Configuration",
+            "elements": [
+              {
+                "name": "publicIP",
+                "type": "Microsoft.Network.PublicIpAddressCombo",
+                "label": {
+                  "publicIpAddress": "Public IP address name",
+                  "domainNameLabel": "Domain name label"
+                },
+                "toolTip": {
+                  "publicIpAddress": "Name of the public IP address object",
+                  "domainNameLabel": "DNS prefix to use for the public IP address (e.g. [dnsPrefix].region.cloudapp.azure.com)"
+                },
+                "defaultValue": {
+                  "publicIpAddressName": "publicip-teradata",
+                  "domainNameLabel": ""
+                },
+                "constraints": {
+                  "required": {
+                    "domainNameLabel": true
+                  }
+                },
+                "options": {
+                  "hideNone": true,
+                  "hideDomainNameLabel": false,
+                  "hideExisting": true
+                }
+              }	
+            ]
+          }
+        ]
+      }],
+    "outputs": {
+	  "location": "[location()]",
+      "adminUsername": "[basics('adminUsername')]",
+	  "vmNamePrefixViewPoint": "[steps('ViewPointConfig').vmNamePrefix]",
+      "clusterVmSizeViewPoint": "[steps('ViewPointConfig').clusterVmSize]",
+	  "vmNamePrefixServerManager": "[steps('ServerManagerConfig').vmNamePrefix]",
+      "clusterVmSizeServerManager": "[steps('ServerManagerConfig').clusterVmSize]",
+	  "vmNamePrefixDataMover": "[steps('DataMoverConfig').vmNamePrefix]",
+	  "clusterVmSizeDataMover": "[steps('DataMoverConfig').clusterVmSize]",
+	  "vmNamePrefixDSU": "[steps('DSUConfig').vmNamePrefix]",
+      "clusterVmSizeDSU": "[steps('DSUConfig').clusterVmSize]",
+	  "vmNamePrefixdataBase": "[steps('DataBaseConfig').vmNamePrefix]",
+	  "vmCountDataBase": "[steps('DataBaseConfig').clusterNodeCount]",
+      "clusterVmSizeDataBase": "[steps('DataBaseConfig').clusterVmSize]",
+      "authenticationType": "[basics('SSHCredntials').authenticationType]",
+      "password": "[basics('SSHCredntials').password]",
+      "sshKey": "[basics('SSHCredntials').sshPublicKey]",
+	  "vnetResourceGroup": "[steps('generalConfig').virtualNetworkSection.virtualNetwork.resourceGroup]",
+      "vnetName": "[steps('generalConfig').virtualNetworkSection.virtualNetwork.name]",
+      "vnetNewOrExisting": "[steps('generalConfig').virtualNetworkSection.virtualNetwork.newOrExisting]",
+      "vnetAddressPrefix": "[steps('generalConfig').virtualNetworkSection.virtualNetwork.addressPrefix]",
+      "subnetName": "[steps('generalConfig').virtualNetworkSection.virtualNetwork.subnets.subnet.name]",
+      "subnetAddressPrefix": "[steps('generalConfig').virtualNetworkSection.virtualNetwork.subnets.subnet.addressPrefix]",
+      "publicIPAddressNewOrExisting": "[steps('generalConfig').publicIPSection.publicIP.newOrExistingOrNone]",
+      "publicIPAddressResourceGroup": "[steps('generalConfig').publicIPSection.publicIP.resourceGroup]",
+      "publicIPAddressName": "[steps('generalConfig').publicIPSection.publicIP.name]",
+      "publicIPAddressDomainNameLabel": "[steps('generalConfig').publicIPSection.publicIP.domainNameLabel]"
+	}
+  }
+}

@@ -1,0 +1,628 @@
+	{
+	  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	  "contentVersion": "1.0.0.0",
+	  "parameters": {
+		"artifactsBaseUrl": {
+		  "type": "string",
+		  "defaultValue": "",
+		  "metadata": {
+			"description": "Base URL of the solution template gallery package not including the trailing slash",
+			"artifactsBaseUrl": "https://gist.githubusercontent.com/DheerajBathula/860230aa4ac0caefe8982e96da228dbd/raw/f6b0f2045adf3036703d3f6533eb18dfd8495689"
+		  }
+		},
+		"location": {
+		  "type": "string",
+		  "metadata": {
+			"description": "Location were resources will be deployed"
+		  }
+		},
+		"adminUsername": {
+		  "defaultValue": "AzureAdmin",
+		  "type": "string",
+		  "metadata": {
+			"description": "Admin username for the virtual machines and SSH"
+		  }
+		},
+		"adminPassword": {
+		  "type": "securestring",
+		  "defaultValue": "",
+		  "metadata": {
+			"description": "Admin password for the virtual machines and SSH. Keep empty if providing SSH Public Key authentication type."
+		  }
+		},
+		"sshPublicKey": {
+		  "type": "string",
+		  "defaultValue": "",
+		  "metadata": {
+			"description": "SSH public key that will be included on all nodes in the cluster. The OpenSSH public key can be generated with tools like ssh-keygen on Linux or OS X. Keep empty if providing Password authentication type."
+		  }
+		},
+		"authenticationType": {
+		  "type": "string",
+		  "defaultValue": "password",
+		  "allowedValues": [
+			"password",
+			"sshPublicKey"
+		  ],
+		  "metadata": {
+			"description": "Authentication type for the virtual machines"
+		  }
+		},
+		"deployViewPoint": {
+		  "defaultValue": "No",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the View Point VMs"
+		  }
+		},
+		"vmNamePrefixViewPoint": {
+		  "defaultValue": "viewpoint",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the View Point VMs"
+		  }
+		},
+		"clusterVmSizeViewPoint": {
+		  "defaultValue": "Standard_D2",
+		  "type": "string",
+		  "metadata": {
+			"description": "Size of the View Point VMs"
+		  }
+		},
+		"deployServerManager": {
+		  "defaultValue": "No",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the View Point VMs"
+		  }
+		},
+		"vmNamePrefixServerManager": {
+		  "defaultValue": "servermanager",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the Server Manager VMs"
+		  }
+		},
+		"clusterVmSizeServerManager": {
+		  "defaultValue": "Standard_D2",
+		  "type": "string",
+		  "metadata": {
+			"description": "Size of the Server Manager VMs"
+		  }
+		},
+		"deployDataMover": {
+		  "defaultValue": "No",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the View Point VMs"
+		  }
+		},
+		"vmNamePrefixDataMover": {
+		  "defaultValue": "datamover",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the Data Mover VMs"
+		  }
+		},
+		"clusterVmSizeDataMover": {
+		  "defaultValue": "Standard_D2",
+		  "type": "string",
+		  "metadata": {
+			"description": "Size of the Data Mover VMs"
+		  }
+		},
+		"deployDSU": {
+		  "defaultValue": "No",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the View Point VMs"
+		  }
+		},
+		"vmNamePrefixDSU": {
+		  "defaultValue": "dsu",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the DSU VMs"
+		  }
+		},
+		"clusterVmSizeDSU": {
+		  "defaultValue": "Standard_D2",
+		  "type": "string",
+		  "metadata": {
+			"description": "Size of the DSU VMs"
+		  }
+		},
+		"deployDataBase": {
+		  "defaultValue": "Yes",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the View Point VMs"
+		  }
+		},
+		"vmNamePrefixDatabase": {
+		  "defaultValue": "databasetd",
+		  "type": "string",
+		  "metadata": {
+			"description": "Prefix that will be used for the Database VMs"
+		  }
+		},
+		"vmCountDataBase": {
+		  "defaultValue": "1",
+		  "type": "int",
+		  "metadata": {
+			"description": "Number of the Database VMs"
+		  }
+		},
+		"clusterVmSizeDataBase": {
+		  "defaultValue": "Standard_D2",
+		  "type": "string",
+		  "metadata": {
+			"description": "Size of the Database VMs"
+		  }
+		},
+		"vnetResourceGroup": {
+		  "type": "string",
+		  "defaultValue": "TDE_DBE_RG",
+		  "metadata": {
+			"description": "Virtual Network Resource Group for cases when cluster nodes are deployed into an existing VNet"
+		  }
+		},
+		"vnetName": {
+		  "type": "string",
+		  "metadata": {
+			"description": "Virtual Network name"
+		  }
+		},
+		"vnetNewOrExisting": {
+		  "type": "string",
+		  "defaultValue": "new",
+		  "allowedValues": [
+			"new",
+			"existing"
+		  ],
+		  "metadata": {
+			"description": "Parameter that specifies if an new or an existing virtual network should be used for deploying cluster nodes"
+		  }
+		},
+		"vnetAddressPrefix": {
+		  "type": "string",
+		  "defaultValue": "10.1.0.0/16",
+		  "metadata": {
+			"description": "Virtual Network Address Prefix (i.e. CIDR)"
+		  }
+		},
+		"subnetName": {
+		  "type": "string",
+		  "defaultValue": "subnet",
+		  "metadata": {
+			"description": "Cluster servers will be deployed into this subnet within the Virtual Network"
+		  }
+		},
+		"subnetAddressPrefix": {
+		  "type": "string",
+		  "defaultValue": "10.1.0.0/24",
+		  "metadata": {
+			"description": "Virtual Network Cluster Servers subnet Address Prefix (i.e. CIDR)"
+		  }
+		},
+		"publicIPAddressNewOrExisting": {
+		  "type": "string",
+		  "defaultValue": "new",
+		  "allowedValues": [
+			"new",
+			"existing"
+		  ],
+		  "metadata": {
+			"description": "Parameter that specifies if an new or an existing public IP should be used for deployment"
+		  }
+		},
+		"publicIPAddressResourceGroup": {
+		  "type": "string",
+		  "defaultValue": "TDE_DBE_RG",
+		  "metadata": {
+			"description": "Public IP resource group for cases when existing public IP is used"
+		  }
+		},
+		"publicIPAddressName": {
+		  "type": "string",
+		  "defaultValue": "",
+		  "metadata": {
+			"description": "Public IP Address name"
+		  }
+		},
+		"publicIPAddressDomainNameLabel": {
+		  "type": "string",
+		  "defaultValue": "",
+		  "metadata": {
+			"description": "Public IP DNS label"
+		  }
+		}
+	  },
+	  "variables": {
+		"apiVersion": {
+		  "resources": {
+			"deployments": "2016-02-01"
+		  },
+		  "storage": {
+			"storageAccounts": "2015-06-15"
+		  },
+		  "network": {
+			"virtualNetworks": "2016-03-30",
+			"networkInterfaces": "2016-03-30",
+			"loadBalancers": "2016-03-30",
+			"publicIPAddresses": "2016-03-30"
+		  },
+		  "compute": {
+			"availabilitySets": "2016-03-30",
+			"virtualMachines": "2016-03-30",
+			"virtualMachineExtensions": "2016-03-30"
+		  }
+		},
+
+		"baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+		"templateUrlViewPoint": "[concat('https://gist.githubusercontent.com/btprabhu/49bce6e5b4065f9c3fe97dfc82a740db/raw/943e8a0cfe28c58e5dd3a5fd3d1020db3c8034c2/','viewpoint-',parameters('deployViewPoint'),'.json')]",
+		"templateUrlServerManager": "[concat('https://gist.githubusercontent.com/btprabhu/91b0812017f0b0a28c27d9bf4c47dfff/raw/f4baed16a602954b9446cd2f85a742b01708c1b1/','servermanager-',parameters('deployServerManager'),'.json')]",
+		"templateUrlDataMover": "[concat('https://gist.githubusercontent.com/btprabhu/77851007a6f7627c7e825543d2d0f440/raw/33cd7478ef9408024615fe58b1de8fc9ebb6fc2b/','datamover-',parameters('deployDataMover'),'.json')]",
+		"templateUrlDSU": "[concat('https://gist.githubusercontent.com/btprabhu/443121c61a7e934abd60aa468c8a4116/raw/eba1f7098fffc67ff5b15ad3646f9ced04de7552/','dsu-',parameters('deployDSU'),'.json')]",
+		"templateUrlDataBase": "https://gist.githubusercontent.com/btprabhu/3e850efc48bf1251aca46a23175852dd/raw/19551bae2cac893f46be17605fd0e135c498254e/database-Yes.json",
+		"templateUrlPublicIP": "[concat('https://gist.githubusercontent.com/btprabhu/ecf8c8a9e1e09e89a703bfe561eb8005/raw/4f5c257beef1ffcea5d5d011e11328152633ddc0/','publicIP-',parameters('publicIPAddressNewOrExisting'),'.json')]",
+		"templateUrlVnet": "[concat('https://gist.githubusercontent.com/btprabhu/74c452306d7b5c22fbfba83cc5bd6916/raw/84af06fe85a47c79e761e927a5b7d398a0035eaa/vnet-',parameters('vnetNewOrExisting'),'.json')]",
+
+		"sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+		"linuxConfiguration_sshPublicKey": {
+		  "disablePasswordAuthentication": "true",
+		  "ssh": {
+			"publicKeys": [
+			  {
+				"path": "[variables('sshKeyPath')]",
+				"keyData": "[parameters('sshPublicKey')]"
+			  }
+			]
+		  }
+		},
+		"linuxConfiguration_password": { },
+		"linuxConfiguration": "[variables(concat('linuxConfiguration_',parameters('authenticationType')))]",
+
+		"publicIPID": "[resourceId(parameters('publicIPAddressResourceGroup'), 'Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]",
+		"vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+		"subnetID": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
+
+		"storageAccountDiagnostics": "[concat('d',uniqueString(resourceGroup().id,'d'))]"
+	  },
+	  "resources": [
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "vnet",
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlVnet')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "vnetName": {
+				"value": "[parameters('vnetName')]"
+			  },
+			  "vnetResourceGroup": {
+				"value": "[parameters('vnetResourceGroup')]"
+			  },
+			  "vnetAddressPrefix": {
+				"value": "[parameters('vnetAddressPrefix')]"
+			  },
+			  "subnetName": {
+				"value": "[parameters('subnetName')]"
+			  },
+			  "subnetAddressPrefix": {
+				"value": "[parameters('subnetAddressPrefix')]"
+			  }
+			}
+		  }
+		},
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "publicIP",
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlPublicIP')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "publicIPAddressName": {
+				"value": "[parameters('publicIPAddressName')]"
+			  },
+			  "publicIPAddressType": {
+				"value": "Dynamic"
+			  },
+			  "publicIPAddressDomainNameLabel": {
+				"value": "[parameters('publicIPAddressDomainNameLabel')]"
+			  },
+			  "publicIPAddressResourceGroup": {
+				"value": "[parameters('publicIPAddressResourceGroup')]"
+			  }
+			}
+		  }
+		},
+		{
+		  "apiVersion": "2015-06-15",
+		  "type": "Microsoft.Storage/storageAccounts",
+		  "name": "[variables('storageAccountDiagnostics')]",
+		  "location": "[parameters('location')]",
+		  "properties": {
+			"accountType": "Standard_LRS"
+		  }
+		},
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "viewpoint",
+		  "dependsOn": [
+			"[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountDiagnostics'))]",
+			"[concat('Microsoft.Resources/deployments/', 'vnet')]",
+			"[concat('Microsoft.Resources/deployments/', 'publicIP')]"
+		  ],
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlViewPoint')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "adminUsername": {
+				"value": "[parameters('adminUsername')]"
+			  },
+			  "adminPassword": {
+				"value": "[parameters('adminPassword')]"
+			  },
+			  "sshPublicKey": {
+				"value": "[parameters('sshPublicKey')]"
+			  },
+			  "authenticationType": {
+				"value": "[parameters('authenticationType')]"
+			  },
+			  "vmNamePrefix": {
+				"value": "[parameters('vmNamePrefixViewPoint')]"
+			  },
+			  "vmSize": {
+				"value": "[parameters('clusterVmSizeViewPoint')]"
+			  },
+			  "osDiskVhdUri": {
+				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+			  },
+			  "subnetID": {
+				"value": "[variables('subnetID')]"
+			  },
+			  "storageAccountDiagnostics": {
+				"value": "[variables('storageAccountDiagnostics')]"
+			  }
+			}
+		  }
+		},
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "servermanager",
+		  "dependsOn": [
+			"[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountDiagnostics'))]",
+			"[concat('Microsoft.Resources/deployments/', 'vnet')]",
+			"[concat('Microsoft.Resources/deployments/', 'viewpoint')]",
+			"[concat('Microsoft.Resources/deployments/', 'publicIP')]"
+		  ],
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlServerManager')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "adminUsername": {
+				"value": "[parameters('adminUsername')]"
+			  },
+			  "adminPassword": {
+				"value": "[parameters('adminPassword')]"
+			  },
+			  "sshPublicKey": {
+				"value": "[parameters('sshPublicKey')]"
+			  },
+			  "authenticationType": {
+				"value": "[parameters('authenticationType')]"
+			  },
+			  "vmNamePrefix": {
+				"value": "[parameters('vmNamePrefixServerManager')]"
+			  },
+			  "vmSize": {
+				"value": "[parameters('clusterVmSizeServerManager')]"
+			  },
+			  "osDiskVhdUri": {
+				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+			  },
+			  "subnetID": {
+				"value": "[variables('subnetID')]"
+			  },
+			  "storageAccountDiagnostics": {
+				"value": "[variables('storageAccountDiagnostics')]"
+			  }
+			}
+		  }
+		},
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "datamover",
+		  "dependsOn": [
+			"[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountDiagnostics'))]",
+			"[concat('Microsoft.Resources/deployments/', 'vnet')]",
+			"[concat('Microsoft.Resources/deployments/', 'servermanager')]",
+			"[concat('Microsoft.Resources/deployments/', 'publicIP')]"
+		  ],
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlDataMover')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "adminUsername": {
+				"value": "[parameters('adminUsername')]"
+			  },
+			  "adminPassword": {
+				"value": "[parameters('adminPassword')]"
+			  },
+			  "sshPublicKey": {
+				"value": "[parameters('sshPublicKey')]"
+			  },
+			  "authenticationType": {
+				"value": "[parameters('authenticationType')]"
+			  },
+			  "vmNamePrefix": {
+				"value": "[parameters('vmNamePrefixDataMover')]"
+			  },
+			  "vmSize": {
+				"value": "[parameters('clusterVmSizeDataMover')]"
+			  },
+			  "osDiskVhdUri": {
+				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+			  },
+			  "subnetID": {
+				"value": "[variables('subnetID')]"
+			  },
+			  "storageAccountDiagnostics": {
+				"value": "[variables('storageAccountDiagnostics')]"
+			  }
+			}
+		  }
+		},
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "dsu",
+		  "dependsOn": [
+			"[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountDiagnostics'))]",
+			"[concat('Microsoft.Resources/deployments/', 'vnet')]",
+			"[concat('Microsoft.Resources/deployments/', 'datamover')]",
+			"[concat('Microsoft.Resources/deployments/', 'publicIP')]"
+		  ],
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlDSU')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "adminUsername": {
+				"value": "[parameters('adminUsername')]"
+			  },
+			  "adminPassword": {
+				"value": "[parameters('adminPassword')]"
+			  },
+			  "sshPublicKey": {
+				"value": "[parameters('sshPublicKey')]"
+			  },
+			  "authenticationType": {
+				"value": "[parameters('authenticationType')]"
+			  },
+			  "vmCount": {
+				"value": "[parameters('vmCountDataBase')]"
+			  },
+			  "vmNamePrefix": {
+				"value": "[parameters('vmNamePrefixDSU')]"
+			  },
+			  "vmSize": {
+				"value": "[parameters('clusterVmSizeDSU')]"
+			  },
+			  "osDiskVhdUri": {
+				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+			  },
+			  "subnetID": {
+				"value": "[variables('subnetID')]"
+			  },
+			  "storageAccountDiagnostics": {
+				"value": "[variables('storageAccountDiagnostics')]"
+			  }
+			}
+		  }
+		},
+		{
+		  "apiVersion": "2016-02-01",
+		  "type": "Microsoft.Resources/deployments",
+		  "name": "database",
+		  "dependsOn": [
+			"[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountDiagnostics'))]",
+			"[concat('Microsoft.Resources/deployments/', 'vnet')]",
+			"[concat('Microsoft.Resources/deployments/', 'dsu')]",
+			"[concat('Microsoft.Resources/deployments/', 'publicIP')]"
+		  ],
+		  "properties": {
+			"mode": "Incremental",
+			"templateLink": {
+			  "uri": "[variables('templateUrlDataBase')]",
+			  "contentVersion": "1.0.0.0"
+			},
+			"parameters": {
+			  "location": {
+				"value": "[parameters('location')]"
+			  },
+			  "adminUsername": {
+				"value": "[parameters('adminUsername')]"
+			  },
+			  "adminPassword": {
+				"value": "[parameters('adminPassword')]"
+			  },
+			  "sshPublicKey": {
+				"value": "[parameters('sshPublicKey')]"
+			  },
+			  "authenticationType": {
+				"value": "[parameters('authenticationType')]"
+			  },
+			  "vmCount": {
+				"value": "[parameters('vmCountDataBase')]"
+			  },
+			  "vmNamePrefix": {
+				"value": "[parameters('vmNamePrefixDatabase')]"
+			  },
+			  "vmSize": {
+				"value": "[parameters('clusterVmSizeDataBase')]"
+			  },
+			  "osDiskVhdUri": {
+				"value": "https://uniquestorageaccountt12.blob.core.windows.net/images/avtdrepro4-osDisk.9708f2f2-af3b-4572-9acf-e70fad7a1947.vhd"
+			  },
+			  "subnetID": {
+				"value": "[variables('subnetID')]"
+			  },
+			  "storageAccountDiagnostics": {
+				"value": "[variables('storageAccountDiagnostics')]"
+			  }
+			}
+		  }
+		}
+	  ],
+	  "outputs": {
+		"managementUrl": {
+		  "type": "string",
+		  "value": "[concat('http://',reference('publicIP').outputs.fqdn.value,'/')]",
+		  "metadata": {
+			"description": "Public URL to access the management interface"
+		  }
+		}
+	  }
+	}

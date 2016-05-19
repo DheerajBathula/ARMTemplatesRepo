@@ -1,0 +1,74 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for the deployed resources"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network name (e.g. vnet-xyz)"
+      }
+    },
+    "vnetResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Resource Group"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network Address Prefix (i.e. CIDR)"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Servers will be deployed into this subnet within the Virtual Network"
+      }
+    },
+    "subnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual Network subnet Address Prefix (i.e. CIDR)"
+      }
+    }
+  },
+  "variables": {
+    "subnetNsgName": "[concat(parameters('vnetName'),'-','nsg')]",
+    "vnetID": "[resourceId(parameters('vnetResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetAddressPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'TDE_DBE_NSG')]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
